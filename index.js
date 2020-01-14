@@ -1,4 +1,3 @@
-// implement your API here
 const express = require("express");
 const db = require("./data/db.js");
 
@@ -29,12 +28,12 @@ server.get("/api/users/:id", (req, res) => {
   const { id } = req.params;
 
   db.findById(id)
-    .then(res => {
-      if (res.length > 0) {
-        res.status(200).json(res);
+    .then(user => {
+      if (user) {
+        res.status(200).json(user);
       } else {
         res.status(404).json({
-          error: "User not found"
+          error: `User ${id} not found`
         });
       }
     })
