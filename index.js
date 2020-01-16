@@ -68,18 +68,16 @@ server.post("/api/users", (req, res) => {
   }
 });
 
-//delete user
-server.delete("/api/users/:id", (req, res) => {
+//delete user and return deleted user back
+server.delete("/api/users/:id", async (req, res) => {
   const { id } = req.params;
 
-  db.remove(id)
-    .then(deletedUser => {
-      if (deletedUser) {
-        res.status(204).end();
+  db.findById(req.params.id)
+    .then(user => {
+      if (user) {
+        return db.remove(req.params.id).then(() => res.json(user));
       } else {
-        res
-          .status(404)
-          .json({ message: "The user with the specified ID does not exist." });
+        res.status(404).json({ message: `User id=${id} could not be deleted` });
       }
     })
     .catch(err => {
@@ -90,23 +88,20 @@ server.delete("/api/users/:id", (req, res) => {
     });
 });
 
-//update user
+//update user and return updated object back
 server.put("/api/users/:id", (req, res) => {
   const id = req.params.id;
   const userInfo = req.body;
 
   if (!userInfo.name || !userInfo.bio) {
-    res.status(400).json({
+    return res.status(400).json({
       errorMessage: "Please provide name and bio for the user."
     });
   } else {
-    db.update(id, userInfo)
+    db.findById(id)
       .then(user => {
         if (user) {
-          res.status(200).json({
-            success: true,
-            user
-          });
+          return db.update(id, userInfo);
         } else {
           res.status(404).json({
             success: false,
@@ -114,6 +109,8 @@ server.put("/api/users/:id", (req, res) => {
           });
         }
       })
+      .then(() => db.findById(id))
+      .then(user => res.json(user))
       .catch(err => {
         res.status(500).json({
           success: false,
