@@ -69,10 +69,10 @@ server.post("/api/users", (req, res) => {
 });
 
 //delete user and return deleted user back
-server.delete("/api/users/:id", async (req, res) => {
+server.delete("/api/users/:id", (req, res) => {
   const { id } = req.params;
 
-  db.findById(req.params.id)
+  db.findById(id)
     .then(user => {
       if (user) {
         return db.remove(req.params.id).then(() => res.json(user));
@@ -90,7 +90,7 @@ server.delete("/api/users/:id", async (req, res) => {
 
 //update user and return updated object back
 server.put("/api/users/:id", (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   const userInfo = req.body;
 
   if (!userInfo.name || !userInfo.bio) {
