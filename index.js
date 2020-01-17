@@ -1,13 +1,12 @@
 const express = require("express");
+const cors = require("cors");
+
 const db = require("./data/db.js");
 
 const server = express();
 
-server.listen(4000, () => {
-  console.log("=== server listening on port 4000 ===");
-});
-
 server.use(express.json());
+server.use(cors());
 
 //get all users
 server.get("/api/users", (req, res) => {
@@ -118,4 +117,8 @@ server.put("/api/users/:id", (req, res) => {
         });
       });
   }
+});
+
+server.listen(4000, () => {
+  console.log("=== server listening on port 4000 ===");
 });
